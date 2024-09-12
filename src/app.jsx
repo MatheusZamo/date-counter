@@ -1,86 +1,52 @@
 import { useState } from "react"
 
-const days = [
-  "Domingo",
-  "Segunda-Feira",
-  "Terça-Feira",
-  "Quarta-Feira",
-  "Quinta-feira",
-  "Sexta-feira",
-]
+const DateMsg = ({ count }) => {
+  const date = new Date()
+  const formattedDate = new Intl.DateTimeFormat("pt-BR", {
+    weekday: "long",
+    month: "short",
+    year: "numeric",
+    day: "2-digit",
+  }).format(date.setDate(date.getDate() + count))
 
-const months = [
-  "Jan",
-  "Fev",
-  "Mar",
-  "Abri",
-  "Mai",
-  "Jun",
-  "Jul",
-  "Ago",
-  "Set",
-  "Out",
-  "Nov",
-  "Dez",
-]
+  const singularPlural = count === 1 || count === -1 ? "dia" : "dias"
+
+  return (
+    <h2>
+      {count > 0
+        ? `${count} ${singularPlural} à partir de hoje será ${formattedDate}`
+        : count < 0
+        ? `${Math.abs(count)} ${singularPlural} atrás era ${formattedDate}`
+        : `Hoje é ${formattedDate}`}
+    </h2>
+  )
+}
 
 const App = () => {
+  const [step, setStep] = useState(1)
   const [count, setCount] = useState(0)
-  const incrementCount = () => setCount((count) => count + 1)
-  const decrementCount = () => setCount((count) => count - 1)
 
-  const present = new Date()
-  const dayOfWeek = days[present.getDay()]
-  const dayOfMonth = present.getDate()
-  const month = months[present.getMonth() - 1]
-  const year = present.getFullYear()
+  const incrementStep = () => setStep((step) => step + 1)
+  const incrementCount = () => setCount((count) => count + step)
+  const decrementStep = () => setStep((step) => (step === 1 ? step : step - 1))
+  const decrementCount = () => setCount((count) => count - step)
 
-  const showMessage = () => {
-    const defaultMessage = `Hoje é ${dayOfWeek}, ${dayOfMonth} de ${month}. de ${year}`
-
-    const decrementMessage = `${Math.abs(count)} dia atrás era ${
-      days[present.getDay() + count]
-    }, ${Math.abs(dayOfMonth + count)} de ${month}. de ${year}`
-
-    const incrementMessage = `${count} dia à partir de hoje será ${
-      days[present.getDay() + count]
-    }, ${dayOfMonth + count} de ${month}. de ${year}`
-
-    if (count === 0) {
-      return defaultMessage
-    }
-
-    if (count > 0) {
-      return incrementMessage
-    }
-
-    if (count < 0) {
-      return decrementMessage
-    }
-  }
-
-  //mensagem dinamica - 1 dia à partir de hoje será domingo, 29 de out. de 2024
   return (
     <div className="container">
       <div className="count">
-        <button onClick={() => console.log("Clicou no menos do Intervalo")}>
-          -
-        </button>
-        <h2>Intervalo: 1</h2>
-        <button onClick={() => console.log("Clicou no mais do Intervalo")}>
-          +
-        </button>
+        <button onClick={decrementStep}>-</button>
+        <h2>Intervalo: {step}</h2>
+        <button onClick={incrementStep}>+</button>
       </div>
       <div className="count">
         <button onClick={decrementCount}>-</button>
-        <h2>Contagem: {Math.abs(count)}</h2>
+        <h2>Contagem: {count}</h2>
         <button onClick={incrementCount}>+</button>
       </div>
-      <h2>{showMessage()}</h2>
+
+      <DateMsg count={count} />
     </div>
   )
 }
 
 export { App }
-
-//mensagem padrao -  Hoje é {dayOfWeek}, {dayOfMonth} de {month}. de {year}
