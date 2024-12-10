@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useReducer } from "react"
 
 const DateMsg = ({ count }) => {
   const date = new Date()
@@ -22,29 +22,42 @@ const DateMsg = ({ count }) => {
   )
 }
 
-const App = () => {
-  const [step, setStep] = useState(1)
-  const [count, setCount] = useState(0)
+const reducer = (state, action) => {
+  const obj = {
+    increment_step: { ...state, step: state.step + 1 },
+    decrement_step: {
+      ...state,
+      step: state.step === 1 ? state.step : state.step - 1,
+    },
+    increment_count: { ...state, count: state.count + state.step },
+    decrement_count: { ...state, count: state.count - state.step },
+  }
 
-  const incrementStep = () => setStep((step) => step + 1)
-  const incrementCount = () => setCount((count) => count + step)
-  const decrementStep = () => setStep((step) => (step === 1 ? step : step - 1))
-  const decrementCount = () => setCount((count) => count - step)
+  return obj[action.type]
+}
+
+const App = () => {
+  const [state, dispatch] = useReducer(reducer, { step: 1, count: 0 })
+
+  const incrementStep = () => dispatch({ type: "increment_step" })
+  const incrementCount = () => dispatch({ type: "increment_count" })
+  const decrementStep = () => dispatch({ type: "decrement_step" })
+  const decrementCount = () => dispatch({ type: "decrement_count" })
 
   return (
     <div className="container">
       <div className="count">
         <button onClick={decrementStep}>-</button>
-        <h2>Intervalo: {step}</h2>
+        <h2>Intervalo: {state.step}</h2>
         <button onClick={incrementStep}>+</button>
       </div>
       <div className="count">
         <button onClick={decrementCount}>-</button>
-        <h2>Contagem: {count}</h2>
+        <h2>Contagem: {state.count}</h2>
         <button onClick={incrementCount}>+</button>
       </div>
 
-      <DateMsg count={count} />
+      <DateMsg count={state.count} />
     </div>
   )
 }
