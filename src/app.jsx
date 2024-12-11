@@ -33,7 +33,7 @@ const reducer = (state, action) => {
     decrement_count: { ...state, count: state.count - state.step },
   }
 
-  return obj[action.type]
+  return obj[action.type] || state
 }
 
 const App = () => {
